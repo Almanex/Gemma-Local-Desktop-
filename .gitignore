@@ -1,0 +1,45 @@
+# .NET build output
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.nupkg
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+SPEC.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.zip
+*.bak
+*.old
+*.WebView2/
+
+# App Data (Local)
+GemmaChatCsharp/bin/
+GemmaChatCsharp/obj/
+gemma-chat/
+workspaces-csharp/
+
+# Legacy Electron (to clean up remaining artifacts)
+node_modules/
+out/
+dist/
+npm-debug.log*
+
+# Models (optional: usually you don't want to commit 5GB models)
+*.gguf
