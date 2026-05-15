@@ -27,7 +27,27 @@ namespace GemmaChatWindows
                 {
                     UpdatePreview(viewModel.PreviewSource);
                 }
+
+                // Auto-scroll when generating
+                if (e.PropertyName == nameof(ChatViewModel.IsGenerating) && viewModel.IsGenerating)
+                {
+                    ScrollToBottom();
+                }
             };
+
+            // Auto-scroll when new messages are added
+            viewModel.Messages.CollectionChanged += (s, e) =>
+            {
+                ScrollToBottom();
+            };
+        }
+
+        private void ScrollToBottom()
+        {
+            Dispatcher.InvokeAsync(() =>
+            {
+                ChatScrollViewer.ScrollToEnd();
+            }, System.Windows.Threading.DispatcherPriority.Background);
         }
 
         private async void InitializeWebViewAsync()
@@ -42,6 +62,12 @@ namespace GemmaChatWindows
                 // Match the original: white bg and light theme for the preview
                 PreviewWebView.CoreWebView2.Profile.PreferredColorScheme = Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme.Light;
                 PreviewWebView.DefaultBackgroundColor = System.Drawing.Color.White;
+
+                PreviewWebView.NavigationCompleted += (s, e) =>
+                {
+                    PreviewWebView.Focus();
+                    PreviewWebView.CoreWebView2.ExecuteScriptAsync("window.focus();");
+                };
 
                 var vm = (ChatViewModel)DataContext;
                 if (!string.IsNullOrEmpty(vm.PreviewSource))

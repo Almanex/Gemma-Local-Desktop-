@@ -16,7 +16,7 @@ public class LlamaService
     private Process? _serverProcess;
     private readonly int _port = 11435;
     private readonly HttpClient _httpClient = new();
-    private const string ReleaseTag = "b9145";
+    private const string ReleaseTag = "b9151";
 
     private static readonly Dictionary<string, string> ModelUrls = new()
     {
@@ -40,13 +40,39 @@ public class LlamaService
 
     public async Task InstallAsync(string modelName, IProgress<(string Message, double? Progress)>? progress = null, CancellationToken cancellationToken = default)
     {
+        StopServer(); // Ensure nothing is locking the bin folder
+
         Directory.CreateDirectory(DataDir);
         Directory.CreateDirectory(BinDir);
         Directory.CreateDirectory(ModelsDir);
 
-        if (!File.Exists(ServerPath))
+        var gpu = DetectNvidiaGpu();
+        var binTypePath = Path.Combine(BinDir, "type.txt");
+        var currentType = $"{(gpu.Available ? $"cuda-{gpu.CudaVersion}" : "cpu")}-{ReleaseTag}";
+        var installedType = File.Exists(binTypePath) ? File.ReadAllText(binTypePath).Trim() : "unknown";
+        
+        // Log detection results for debugging
+        var logPath = Path.Combine(DataDir, "llama-server.log");
+        File.AppendAllText(logPath, $"[SETUP] GPU Detected: {gpu.Available}, VRAM: {gpu.VramGb}GB, CUDA: {gpu.CudaVersion}, TargetType: {currentType}, InstalledType: {installedType}\n");
+
+        bool isCudaMissing = gpu.Available && !File.Exists(Path.Combine(BinDir, "ggml-cuda.dll"));
+
+        if (!File.Exists(ServerPath) || installedType != currentType || isCudaMissing)
         {
-            var gpu = DetectNvidiaGpu();
+            progress?.Report(("Cleaning old binaries...", 0));
+            StopServer();
+            await Task.Delay(1000); 
+
+            // Hard delete the bin folder to be sure
+            for (int i = 0; i < 3; i++)
+            {
+                try {
+                    if (Directory.Exists(BinDir)) Directory.Delete(BinDir, true);
+                    break;
+                } catch { await Task.Delay(1000); }
+            }
+            Directory.CreateDirectory(BinDir);
+
             var serverZip = Path.Combine(DataDir, "tmp_llama.zip");
             var dllZip = Path.Combine(DataDir, "tmp_cudart.zip");
             var (serverUrl, dllUrl) = GetServerDownloadUrls(gpu);
@@ -61,11 +87,21 @@ public class LlamaService
             }
 
             progress?.Report(("Extracting llama.cpp server...", 0.28));
-            if (Directory.Exists(BinDir))
-                Directory.CreateDirectory(BinDir);
-            ZipFile.ExtractToDirectory(serverZip, BinDir, true);
+            await ExtractZipAsync(serverZip, BinDir);
             if (File.Exists(dllZip))
-                ZipFile.ExtractToDirectory(dllZip, BinDir, true);
+                await ExtractZipAsync(dllZip, BinDir);
+            
+            // Verify extraction
+            if (gpu.Available && !File.Exists(Path.Combine(BinDir, "ggml-cuda.dll")))
+            {
+                // Fallback: maybe it's named differently or in a subfolder?
+                var found = Directory.GetFiles(BinDir, "ggml-cuda.dll", SearchOption.AllDirectories).FirstOrDefault();
+                if (found != null) File.Move(found, Path.Combine(BinDir, "ggml-cuda.dll"), true);
+                else throw new Exception("CUDA backend (ggml-cuda.dll) was not found in the extracted files.");
+            }
+
+            File.WriteAllText(binTypePath, currentType);
+            
             TryDelete(serverZip);
             TryDelete(dllZip);
 
@@ -107,17 +143,32 @@ public class LlamaService
         };
 
         _serverProcess = Process.Start(startInfo);
+        if (_serverProcess == null) throw new InvalidOperationException("Failed to start llama-server process.");
+
+        var logPath = Path.Combine(DataDir, "llama-server.log");
+        File.AppendAllText(logPath, $"\n------------------------------------------------\nServer started at {DateTime.Now}\nArgs: {startInfo.Arguments}\n\n");
 
         _ = Task.Run(() => 
         {
             while (_serverProcess != null && !_serverProcess.StandardOutput.EndOfStream)
             {
                 var line = _serverProcess.StandardOutput.ReadLine();
-                Debug.WriteLine($"[llama] {line}");
+                if (line != null) File.AppendAllText(logPath, $"[OUT] {line}\n");
+                Debug.WriteLine($"[llama-out] {line}");
             }
         });
 
-        await WaitForHealthAsync(TimeSpan.FromMinutes(2), cancellationToken);
+        _ = Task.Run(() => 
+        {
+            while (_serverProcess != null && !_serverProcess.StandardError.EndOfStream)
+            {
+                var line = _serverProcess.StandardError.ReadLine();
+                if (line != null) File.AppendAllText(logPath, $"[ERR] {line}\n");
+                Debug.WriteLine($"[llama-err] {line}");
+            }
+        });
+
+        await WaitForHealthAsync(TimeSpan.FromMinutes(5), cancellationToken);
         progress?.Report(("Server ready", 1));
     }
 
@@ -125,10 +176,20 @@ public class LlamaService
     {
         if (_serverProcess != null && !_serverProcess.HasExited)
         {
-            _serverProcess.Kill();
+            try { _serverProcess.Kill(true); } catch { }
             _serverProcess.Dispose();
             _serverProcess = null;
         }
+
+        // Also kill any stray llama-server processes just in case
+        try
+        {
+            foreach (var p in Process.GetProcessesByName("llama-server"))
+            {
+                try { p.Kill(true); } catch { }
+            }
+        }
+        catch { }
     }
 
     public async IAsyncEnumerable<string> ChatStreamAsync(string systemPrompt, string userMessage, double temperature = 0.7, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
@@ -242,6 +303,13 @@ public class LlamaService
         while (DateTimeOffset.UtcNow < deadline)
         {
             cancellationToken.ThrowIfCancellationRequested();
+
+            // Fail fast if the process has already died
+            if (_serverProcess != null && _serverProcess.HasExited)
+            {
+                throw new InvalidOperationException("The llama.cpp server process exited unexpectedly during startup. Check llama-server.log for details (it might be a corrupted model file or VRAM issues).");
+            }
+
             try
             {
                 using var res = await _httpClient.GetAsync($"http://127.0.0.1:{_port}/health", cancellationToken);
@@ -285,50 +353,113 @@ public class LlamaService
         try
         {
             var name = RunNvidiaSmi("--query-gpu=name", "--format=csv,noheader");
-            var memory = RunNvidiaSmi("--query-gpu=memory.total", "--format=csv,noheader,numeric");
+            var memory = RunNvidiaSmi("--query-gpu=memory.total", "--format=csv,noheader");
+            
             if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(memory))
                 return (false, 0, "12.4");
 
             var firstMemory = memory.Split('\n', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()?.Trim();
+            // Remove " MiB" or other non-numeric stuff
+            if (firstMemory != null) firstMemory = new string(firstMemory.Where(char.IsDigit).ToArray());
             var vramMb = int.TryParse(firstMemory, out var parsed) ? parsed : 0;
-            var cuda = name.Contains("RTX 40", StringComparison.OrdinalIgnoreCase) ? "13.1" : "12.4";
-            return (true, Math.Max(0, vramMb / 1024), cuda);
+            
+            // Check major CUDA support (case-insensitive)
+            bool isNvidia = name.Contains("RTX", StringComparison.OrdinalIgnoreCase) || 
+                            name.Contains("GTX", StringComparison.OrdinalIgnoreCase) || 
+                            name.Contains("NVIDIA", StringComparison.OrdinalIgnoreCase) ||
+                            name.Contains("Quadro", StringComparison.OrdinalIgnoreCase) ||
+                            name.Contains("Tesla", StringComparison.OrdinalIgnoreCase);
+
+            var cuda = isNvidia ? "12" : "none";
+            return (isNvidia, Math.Max(0, vramMb / 1024), cuda);
         }
-        catch
+        catch (Exception ex)
         {
+            Debug.WriteLine($"GPU detection error: {ex.Message}");
             return (false, 0, "12.4");
+        }
+    }
+
+    private async Task ExtractZipAsync(string zipPath, string destination)
+    {
+        if (!File.Exists(zipPath)) throw new FileNotFoundException("Zip file not found", zipPath);
+        
+        var psi = new ProcessStartInfo
+        {
+            FileName = "powershell.exe",
+            Arguments = $"-Command \"Expand-Archive -Path '{zipPath.Replace("'", "''")}' -DestinationPath '{destination.Replace("'", "''")}' -Force\"",
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardError = true
+        };
+        using var proc = Process.Start(psi);
+        if (proc == null) throw new Exception("Failed to start powershell for extraction");
+        
+        var error = await proc.StandardError.ReadToEndAsync();
+        await proc.WaitForExitAsync();
+        
+        if (proc.ExitCode != 0)
+        {
+            throw new Exception($"Extraction failed (exit code {proc.ExitCode}): {error}");
         }
     }
 
     private static string RunNvidiaSmi(params string[] args)
     {
-        var psi = new ProcessStartInfo
-        {
-            FileName = "nvidia-smi",
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true
+        var logPath = Path.Combine(DataDir, "nvidia-smi-debug.log");
+        string[] possiblePaths = { 
+            "nvidia-smi", 
+            @"C:\Windows\System32\nvidia-smi.exe",
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "nvidia-smi.exe"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "NVIDIA Corporation", "NVSMI", "nvidia-smi.exe")
         };
-        foreach (var arg in args)
-            psi.ArgumentList.Add(arg);
 
-        using var proc = Process.Start(psi);
-        if (proc == null) return "";
-        if (!proc.WaitForExit(5000)) return "";
-        return proc.ExitCode == 0 ? proc.StandardOutput.ReadToEnd().Trim() : "";
+        foreach (var path in possiblePaths)
+        {
+            try
+            {
+                var psi = new ProcessStartInfo
+                {
+                    FileName = path,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                };
+                foreach (var arg in args)
+                    psi.ArgumentList.Add(arg);
+
+                using var proc = Process.Start(psi);
+                if (proc == null) continue;
+                
+                var output = proc.StandardOutput.ReadToEnd();
+                var error = proc.StandardError.ReadToEnd();
+                if (!proc.WaitForExit(3000)) {
+                    File.AppendAllText(logPath, $"Timeout: {path}\n\n");
+                    continue;
+                }
+                
+                File.AppendAllText(logPath, $"Attempted: {path} {string.Join(" ", args)}\nExitCode: {proc.ExitCode}\nOutput: {output}\nError: {error}\n\n");
+
+                if (proc.ExitCode == 0) return output.Trim();
+            }
+            catch (Exception ex)
+            {
+                File.AppendAllText(logPath, $"Failed: {path}\nError: {ex.Message}\n\n");
+            }
+        }
+        return string.Empty;
     }
 
     private static (string Main, string? Dlls) GetServerDownloadUrls((bool Available, int VramGb, string CudaVersion) gpu)
     {
         var baseUrl = $"https://github.com/ggml-org/llama.cpp/releases/download/{ReleaseTag}";
         if (!gpu.Available)
-            return ($"{baseUrl}/llama-b9145-bin-win-cpu-x64.zip", null);
+            return ($"{baseUrl}/llama-{ReleaseTag}-bin-win-cpu-x64.zip", null);
 
-        if (gpu.CudaVersion == "13.1")
-            return ($"{baseUrl}/llama-b9145-bin-win-cuda-13.1-x64.zip", $"{baseUrl}/cudart-llama-bin-win-cuda-13.1-x64.zip");
-
-        return ($"{baseUrl}/llama-b9145-bin-win-cuda-12.4-x64.zip", $"{baseUrl}/cudart-llama-bin-win-cuda-12.4-x64.zip");
+        // b9151 provides cuda-12.4 and cuda-13.1
+        var cuVer = gpu.CudaVersion == "13.1" ? "13.1" : "12.4";
+        return ($"{baseUrl}/llama-{ReleaseTag}-bin-win-cuda-{cuVer}-x64.zip", $"{baseUrl}/cudart-llama-bin-win-cuda-{cuVer}-x64.zip");
     }
 
     private static int RecommendedGpuLayers(string modelPath)

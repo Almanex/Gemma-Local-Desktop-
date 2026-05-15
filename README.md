@@ -18,12 +18,14 @@ Gemma Local Desktop is a native Windows application designed for high-performanc
 
 ## Key Features
 
-- 💬 **Chat Mode** — Conversational AI running locally on your PC.
-- 🛠 **Build Mode** — Coding agent with live preview. Creates and edits websites directly.
-- 📂 **Workspace Persistence** — Per-chat project workspaces saved on disk. Iterative edits preserve existing code.
-- 🎨 **Modern UI** — Custom native Windows design with resizable layouts, sidebar, and dark theme.
-- 🎮 **GPU Acceleration** — Automatic NVIDIA GPU detection and CUDA optimization.
-- 📦 **Zero Config** — Automatically downloads `llama.cpp` runtimes and models on first start.
+- 💬 **Chat Mode** — Optimized for pure dialogue and reasoning.
+- 🛠 **Build Mode** — Specialized workspace for generating code, web apps, and artifacts with a 720px live preview.
+- 🚀 **One-Click Templates** — Instant high-fidelity starters like *Mega Tetris* and *Dynamic Weather Dashboard*.
+- 🖥 **Full-Screen Preview** — One button to view your creation in your default system browser.
+- 📂 **Workspace Persistence** — Per-chat projects saved on disk. The model can read and edit existing files iteratively.
+- 🎨 **Modern UX** — Clean Windows design with glassmorphism, resizable canvas, and dark mode.
+- 🎮 **GPU Acceleration** — Intelligent NVIDIA GPU detection with partial offloading for large models (MoE 26B).
+- 📦 **Zero Config** — Fully automated environment setup: downloads runtimes and models on first start.
 
 ## Requirements
 

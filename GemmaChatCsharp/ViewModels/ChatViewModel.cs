@@ -196,7 +196,7 @@ public partial class ChatViewModel : ObservableObject
     private bool _canvasOpen = true;
 
     [ObservableProperty]
-    private System.Windows.GridLength _canvasWidth = new(520);
+    private System.Windows.GridLength _canvasWidth = new(720);
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsSidebarExpanded))]
@@ -286,7 +286,7 @@ public partial class ChatViewModel : ObservableObject
             });
 
             await _llamaService.InstallAsync(SelectedModel.Name, progress, _cancellationTokenSource.Token);
-            await _llamaService.StartServerAsync(LlamaService.ModelPath(SelectedModel.Name), 0, progress, _cancellationTokenSource.Token);
+            await _llamaService.StartServerAsync(LlamaService.ModelPath(SelectedModel.Name), GpuLayers, progress, _cancellationTokenSource.Token);
 
             IsSetupVisible = false;
             IsChatVisible = true;
@@ -382,23 +382,6 @@ public partial class ChatViewModel : ObservableObject
         SaveState();
     }
 
-    [ObservableProperty]
-    private string _transcriptionLanguageLabel = "AUTO";
-
-    [RelayCommand]
-    private void CycleTranscriptionLanguage()
-    {
-        string[] langs = ["AUTO", "RU", "EN", "DE"];
-        var idx = Array.IndexOf(langs, TranscriptionLanguageLabel);
-        TranscriptionLanguageLabel = langs[(idx + 1) % langs.Length];
-    }
-
-    [RelayCommand]
-    private void ToggleSpeech()
-    {
-        SetupError = "Voice input is not available in the WPF port yet.";
-    }
-
     [RelayCommand]
     private void RefreshPreview() => UpdatePreviewHtml();
 
@@ -408,6 +391,18 @@ public partial class ChatViewModel : ObservableObject
         if (ActiveConversation == null) return;
         SyncWorkspaceToDisk();
         try { System.Diagnostics.Process.Start("explorer.exe", _workspaceService.WorkspaceDir(ActiveConversation.Id)); } catch { }
+    }
+
+    [RelayCommand]
+    private void OpenInBrowser()
+    {
+        if (ActiveConversation == null) return;
+        SyncWorkspaceToDisk();
+        var indexFile = Path.Combine(_workspaceService.WorkspaceDir(ActiveConversation.Id), "index.html");
+        if (File.Exists(indexFile))
+        {
+            try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(indexFile) { UseShellExecute = true }); } catch { }
+        }
     }
 
     [RelayCommand]
@@ -490,13 +485,15 @@ public partial class ChatViewModel : ObservableObject
         {
             var systemPrompt = ActiveMode == "code"
                 ? BuildCodeSystemPrompt()
-                : "You are Gemma, a helpful local assistant. Be clear, concise, and useful. Use markdown when helpful.";
+                : "You are Gemma, a helpful local AI assistant. You are in DIALOGUE mode. Focus on conversation and answering questions. Do not attempt to use code-execution tools or write files to the workspace unless the user specifically asks you to 'Build' something. Use markdown for formatting.";
             var modelInput = ActiveMode == "code"
                 ? BuildCodeUserMessage(currentInput)
                 : BuildChatUserMessage(currentInput);
 
+            var sw = System.Diagnostics.Stopwatch.StartNew();
             var rawContent = "";
             Dictionary<string, string> latestFiles = new();
+            
             if (ActiveMode == "code")
             {
                 UpdatePreviewHtml();
@@ -506,35 +503,49 @@ public partial class ChatViewModel : ObservableObject
             {
                 rawContent += token;
 
-                var parsed = ParseCodeBlocks(rawContent);
-                latestFiles = parsed.Files;
-                assistantMsg.Content = parsed.DisplayText;
-                SyncToolCards(assistantMsg, parsed.Cards);
-                
-                System.Windows.Application.Current.Dispatcher.Invoke(() => {
-                    SaveState();
+                // Throttle UI updates to ~15 FPS (64ms) to avoid saturating the dispatcher
+                if (sw.ElapsedMilliseconds > 64)
+                {
+                    sw.Restart();
+                    var parsed = ParseCodeBlocks(rawContent);
+                    latestFiles = parsed.Files;
+                    var displayText = parsed.DisplayText;
+                    var cards = parsed.Cards;
+                    var activeName = parsed.ActiveFileName ?? (latestFiles.Count > 0 ? latestFiles.Keys.Last() : null);
+                    var activeCode = activeName != null ? latestFiles[activeName] : null;
 
-                    if (latestFiles.Count > 0)
-                    {
-                        var activeName = parsed.ActiveFileName ?? latestFiles.Keys.Last();
-                        var activeCode = latestFiles[activeName];
-                        UpdateCurrentCode(activeName, activeCode);
-
-                        // Live write to disk for preview
-                        _workspaceService.WriteFile(ActiveConversation?.Id ?? "default", activeName, activeCode);
-
-                        if (!_canvasOpen)
+                    System.Windows.Application.Current.Dispatcher.BeginInvoke(() => {
+                        assistantMsg.Content = displayText;
+                        SyncToolCards(assistantMsg, cards);
+                        
+                        if (ActiveMode == "code" && activeName != null && activeCode != null)
                         {
-                            _canvasOpen = true;
-                            OnPropertyChanged(nameof(IsCanvasOpen));
+                            UpdateCurrentCode(activeName, activeCode);
+                            _workspaceService.WriteFile(ActiveConversation?.Id ?? "default", activeName, activeCode);
+
+                            if (!_canvasOpen)
+                            {
+                                _canvasOpen = true;
+                                OnPropertyChanged(nameof(IsCanvasOpen));
+                            }
+                            if (ActiveCanvasTab != "code" && ActiveCanvasTab != "preview") ActiveCanvasTab = "code";
                         }
-                        ActiveCanvasTab = "code";
-                    }
-                });
+                    });
+                }
             }
 
+            // Final update to ensure everything is caught
+            var finalParsed = ParseCodeBlocks(rawContent);
+            latestFiles = finalParsed.Files;
+            assistantMsg.Content = finalParsed.DisplayText;
+            SyncToolCards(assistantMsg, finalParsed.Cards);
+            
             if (latestFiles.Count > 0)
+            {
                 UpdateWorkspaceFiles(latestFiles);
+                var lastFile = finalParsed.ActiveFileName ?? latestFiles.Keys.Last();
+                UpdateCurrentCode(lastFile, latestFiles[lastFile]);
+            }
 
             var actions = ParseActionBlocks(rawContent);
             if (actions.Count > 0)
@@ -547,7 +558,7 @@ public partial class ChatViewModel : ObservableObject
 
             UpdatePreviewHtml();
             ValidateProject(assistantMsg);
-            if (WorkspaceFiles.Count > 0)
+            if (ActiveMode == "code" && WorkspaceFiles.Count > 0)
             {
                 foreach (var card in assistantMsg.ToolCards)
                     card.IsRunning = false;
