@@ -11,6 +11,7 @@
         Title="Gemma Local Desktop" Height="750" Width="1050" 
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         WindowStartupLocation="CenterScreen"
+        Icon="Assets/gemma-logo.ico"
         FontFamily="Segoe UI, Inter, sans-serif" FontSize="14">
     
     <WindowChrome.WindowChrome>
