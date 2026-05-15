@@ -406,19 +406,6 @@ public partial class ChatViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void ExportProject()
-    {
-        if (ActiveConversation == null) return;
-        SyncWorkspaceToDisk();
-        try
-        {
-            var zip = _workspaceService.ExportZip(ActiveConversation.Id);
-            System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{zip}\"");
-        }
-        catch { }
-    }
-
-    [RelayCommand]
     private void RegenerateMessage(ChatMessage msg)
     {
         if (msg == null || ActiveConversation == null || IsGenerating) return;

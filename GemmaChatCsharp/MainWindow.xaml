@@ -21,7 +21,6 @@
         <KeyBinding Key="N" Modifiers="Control" Command="{Binding NewChatCommand}"/>
         <KeyBinding Key="B" Modifiers="Control" Command="{Binding ToggleModeCommand}"/>
         <KeyBinding Key="Oem5" Modifiers="Control" Command="{Binding ToggleCanvasCommand}"/>
-        <KeyBinding Key="E" Modifiers="Control" Command="{Binding ExportProjectCommand}"/>
     </Window.InputBindings>
 
     <Window.Resources>
@@ -887,7 +886,7 @@
                                      VerticalScrollBarVisibility="Auto"/>
 
                             <TextBlock Text="Shortcuts" Foreground="#888888" FontSize="11" FontWeight="SemiBold" Margin="0,22,0,8"/>
-                            <TextBlock Text="Ctrl+N new chat&#x0a;Ctrl+B Chat/Build&#x0a;Ctrl+\ toggle Canvas&#x0a;Ctrl+E export project" Foreground="#AAAAAA" FontSize="12" LineHeight="20"/>
+                            <TextBlock Text="Ctrl+N new chat&#x0a;Ctrl+B Chat/Build&#x0a;Ctrl+\ toggle Canvas" Foreground="#AAAAAA" FontSize="12" LineHeight="20"/>
                         </StackPanel>
                     </ScrollViewer>
 

@@ -7,7 +7,7 @@
 <h1 align="center">Gemma Local Desktop</h1>
 
 <p align="center">
-  <strong>Native multimodal AI assistant and coding workspace.</strong><br/>
+  <strong>Native Windows AI assistant and coding workspace.</strong><br/>
   Powered by Google's Gemma via llama.cpp.<br/>
   No API keys. No cloud. Works 100% offline.
 </p>
@@ -20,15 +20,16 @@ This is an **experimental project** designed to push the boundaries of local AI 
 
 ### Model Performance Notes:
 - **Small Models (E2B / E4B)**: Great for quick tests and low-latency interactions. While capable, they have natural limitations due to their parameter count—operate within reasonable expectations.
-- **Large Models (26B / 31B)**: These models handle complex coding tasks, logic, and creative requests **perfectly**, as originally intended. They provide a frontier-level experience on consumer hardware.
+- **Large Models (26B / 31B)**: These models handle complex coding tasks, logic, and creative requests **perfectly**, as originally intended. They provide a good level of performance on consumer hardware.
 
 ---
 
 ## 📸 Screenshots
 
 <p align="center">
-  <img src="GemmaChatCsharp/Assets/gemma-chat-win_1.png" alt="Setup Screen" width="45%" />
-  <img src="GemmaChatCsharp/Assets/gemma-chat-win_2.png" alt="Chat & Build Workspace" width="45%" />
+  <img src="GemmaChatCsharp/Assets/gemma-chat-win_1.png" alt="Setup Screen" width="32%" />
+  <img src="GemmaChatCsharp/Assets/gemma-chat-win_2.png" alt="Chat & Build Workspace" width="32%" />
+  <img src="GemmaChatCsharp/Assets/gemma-chat-win_3.png" alt="Code & Preview" width="32%" />
 </p>
 
 ---
@@ -81,7 +82,6 @@ On first launch, the app will:
 - `Ctrl + N`: New chat
 - `Ctrl + B`: Toggle Chat/Build mode
 - `Ctrl + \`: Toggle Canvas (Preview/Code)
-- `Ctrl + E`: Export project to ZIP
 
 ## License
 
