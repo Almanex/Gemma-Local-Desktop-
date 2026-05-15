@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <Resource Include="Assets\gemma-logo.png" />
+    <Resource Include="Assets\gemma-logo.ico" />
   </ItemGroup>
 
 </Project>

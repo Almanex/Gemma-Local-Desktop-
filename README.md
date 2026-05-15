@@ -60,12 +60,29 @@ This is an **experimental project** designed to push the boundaries of local AI 
    cd GemmaChatCsharp
    dotnet run
    ```
+   ```
 
 On first launch, the app will:
 1. Detect your hardware (CPU vs NVIDIA GPU).
 2. Download the appropriate `llama.cpp` server binaries.
 3. Download the recommended Gemma model (~1.6GB).
 4. Initialize your local workspace.
+
+## Build & Publish
+
+If you want to create a standalone executable:
+
+### Standard Build
+```powershell
+dotnet build -c Release
+```
+
+### Create Single EXE (Portable)
+To generate a single `.exe` file that includes everything (self-contained):
+```powershell
+dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+```
+The output will be in `bin/Release/net10.0-windows/win-x64/publish/`.
 
 ## Tech Stack
 
