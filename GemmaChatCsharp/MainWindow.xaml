@@ -69,9 +69,9 @@
 
                 <TextBlock Text="Welcome to Gemma Local Desktop" Foreground="White" FontSize="26" FontWeight="SemiBold" HorizontalAlignment="Center"/>
                 
-                <TextBlock Text="A local multimodal AI assistant, powered by Google's Gemma 4 via llama.cpp." 
+                <TextBlock Text="A local AI assistant and developer workspace, powered by Google's Gemma via llama.cpp." 
                            Foreground="#888888" FontSize="13.5" HorizontalAlignment="Center" Margin="0,12,0,0" TextWrapping="Wrap" TextAlignment="Center"/>
-                <TextBlock Text="Runs 100% on your PC. Text, Image, and Audio supported." 
+                <TextBlock Text="Runs 100% on your PC. Privacy by design. No cloud required." 
                            Foreground="#888888" FontSize="13.5" HorizontalAlignment="Center" Margin="0,4,0,32" TextWrapping="Wrap" TextAlignment="Center"/>
 
                 <TextBlock Text="CHOOSE A MODEL TO START" Foreground="#888888" FontSize="11" FontWeight="SemiBold" Margin="4,0,0,8"/>
@@ -463,38 +463,38 @@
 
                             <Border Grid.Row="0" Grid.Column="0" Background="#0AFFFFFF" BorderBrush="#1AFFFFFF" BorderThickness="1" CornerRadius="12" Padding="16" Cursor="Hand" MaxWidth="300">
                                 <Border.InputBindings>
-                                    <MouseBinding Gesture="LeftClick" Command="{Binding SetInputTextCommand}" CommandParameter="Act as a world-class Frontend Engineer. Create a flawless, one-file personal portfolio. 1. UI: Strict Dark Mode (#0f172a) with glassmorphism elements. 2. Navigation: Fixed top bar with backdrop-blur. 3. Hero: Large gradient text 'Creative Developer'. 4. Grid: 3 project cards with 'hover:transform: scale(1.05)' and soft shadows. 5. Typography: Use Inter font. Ensure every element is pixel-perfect. Write everything in a single index.html with embedded CSS."/>
+                                    <MouseBinding Gesture="LeftClick" Command="{Binding SetInputTextCommand}" CommandParameter="Create a world-class 'Mega Portfolio' in a single index.html. TECHNICAL BLUEPRINT: 1. ARCHITECTURE: Single-page layout with a fixed, glassmorphic navigation bar. 2. ANIMATIONS: Use IntersectionObserver API to trigger smooth fade-in/up animations as sections enter the viewport. 3. DESIGN: Strict Dark Mode (Background: #0f172a), Inter font, and CSS variables for a consistent primary-color accent. 4. COMPONENTS: Hero section with animated gradient text, a responsive 3-column project grid with 'hover:scale(1.05)' transitions, and a clean contact footer. 5. RESPONSIVENESS: Use Flexbox/Grid for a perfect mobile-to-desktop transition."/>
                                 </Border.InputBindings>
                                 <StackPanel>
                                     <TextBlock Text="Mega Portfolio" Foreground="White" FontWeight="Medium" FontSize="14"/>
-                                    <TextBlock Text="Detailed instructions for a pixel-perfect, glassmorphic developer site." Foreground="#888888" FontSize="12.5" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                                    <TextBlock Text="A world-class developer portfolio with scroll-reveal animations and glassmorphism." Foreground="#888888" FontSize="12.5" TextWrapping="Wrap" Margin="0,4,0,0"/>
                                 </StackPanel>
                             </Border>
                             <Border Grid.Row="0" Grid.Column="2" Background="#0AFFFFFF" BorderBrush="#1AFFFFFF" BorderThickness="1" CornerRadius="12" Padding="16" Cursor="Hand" MaxWidth="300">
                                 <Border.InputBindings>
-                                    <MouseBinding Gesture="LeftClick" Command="{Binding SetInputTextCommand}" CommandParameter="Create a stunning 'Dynamic Weather Dashboard' in a single index.html. 1. UI: Glassmorphism cards with a blurred background that changes based on weather (sunny, rainy, snowy). 2. Features: A large current temperature display, a 5-day forecast grid, and animated SVG weather icons. 3. Interactivity: Use smooth CSS transitions and a clean, high-end typography (Inter font). Ensure the design looks like a premium weather app."/>
+                                    <MouseBinding Gesture="LeftClick" Command="{Binding SetInputTextCommand}" CommandParameter="Create a premium 'Dynamic Weather Dashboard' in a single index.html. TECHNICAL BLUEPRINT: 1. ENGINE: Use a robust data structure for weather states; implement a function to switch UI themes (sunny/rainy/snowy) by updating CSS variables and body classes. 2. UI: Full-screen glassmorphism layout with blurred backgrounds. 3. COMPONENTS: Hero section for current temp, a scrollable 5-day forecast grid, and custom SVG icons for each weather type. 4. FEATURES: Real-time clock, dynamic wind/humidity indicators, and high-end typography (Outfit or Inter font). 5. VISUALS: Use subtle CSS keyframe animations for the weather icons to make the app feel alive."/>
                                 </Border.InputBindings>
                                 <StackPanel>
                                     <TextBlock Text="Weather Dashboard" Foreground="White" FontWeight="Medium" FontSize="14"/>
-                                    <TextBlock Text="A beautiful weather app with dynamic backgrounds and glassmorphism." Foreground="#888888" FontSize="12.5" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                                    <TextBlock Text="A dynamic weather app with theme-switching logic and animated SVG icons." Foreground="#888888" FontSize="12.5" TextWrapping="Wrap" Margin="0,4,0,0"/>
                                 </StackPanel>
                             </Border>
                             <Border Grid.Row="2" Grid.Column="0" Background="#0AFFFFFF" BorderBrush="#1AFFFFFF" BorderThickness="1" CornerRadius="12" Padding="16" Cursor="Hand" MaxWidth="300">
                                 <Border.InputBindings>
-                                    <MouseBinding Gesture="LeftClick" Command="{Binding SetInputTextCommand}" CommandParameter="Create a high-performance Tetris game in ONE index.html file. Requirements: 1. A 10x20 grid with a 'Next Piece' preview window. 2. Control: Move with Left/Right, Soft Drop with Down, Instant Drop with Space. 3. ROTATION: Essential - rotate pieces using the 'Up' arrow or 'W' key. 4. Visuals: Glowing neon blocks with particle effects when a line is cleared. 5. Scoring: Level up system and high-score persistence. Flawless collision and rotation logic is mandatory."/>
+                                    <MouseBinding Gesture="LeftClick" Command="{Binding SetInputTextCommand}" CommandParameter="Create a robust, high-performance Tetris game in ONE index.html file. TECHNICAL BLUEPRINT: 1. CORE: Use a 10x20 2D array matrix for the arena. 2. SHAPES: Define the 7 Tetrominoes as small matrices. 3. ROTATION: Implement 90-degree clockwise matrix rotation using the 'Up' arrow or 'W'. MANDATORY: Add 'Wall-Kick' logic (if a piece hits a wall during rotation, move it 1-2 pixels inward to prevent sticking). 4. CONTROLS: Arrow keys or WASD. Space for instant drop. 5. LOOP: Use requestAnimationFrame with a deltaTime accumulator for consistent gravity. 6. UI: Neon glowing blocks, a 'Next' piece preview, and smooth line-clear animations. Ensure the collision detection is perfectly checked before any movement or rotation."/>
                                 </Border.InputBindings>
                                 <StackPanel>
                                     <TextBlock Text="Mega Tetris" Foreground="White" FontWeight="Medium" FontSize="14"/>
-                                    <TextBlock Text="A classic Tetris clone with neon blocks, levels, and perfect rotation logic." Foreground="#888888" FontSize="12.5" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                                    <TextBlock Text="A classic Tetris clone with a technical blueprint for perfect rotation and collisions." Foreground="#888888" FontSize="12.5" TextWrapping="Wrap" Margin="0,4,0,0"/>
                                 </StackPanel>
                             </Border>
                             <Border Grid.Row="2" Grid.Column="2" Background="#0AFFFFFF" BorderBrush="#1AFFFFFF" BorderThickness="1" CornerRadius="12" Padding="16" Cursor="Hand" MaxWidth="300">
                                 <Border.InputBindings>
-                                    <MouseBinding Gesture="LeftClick" Command="{Binding SetInputTextCommand}" CommandParameter="Design a premium, Apple-style 'Scientific Calculator' in a single index.html. 1. UI: A sleek dark glassmorphism design with rounded buttons. 2. Functionality: Support basic math, percentages, and scientific functions (sin, cos, log). 3. Features: Responsive layout, history of previous calculations, and smooth animations when clicking buttons. Use a large, clean font for the display."/>
+                                    <MouseBinding Gesture="LeftClick" Command="{Binding SetInputTextCommand}" CommandParameter="Create a professional 'Scientific Calculator' in a single index.html. TECHNICAL BLUEPRINT: 1. LOGIC: Use a state-machine based accumulator for math operations; implement a robust string-expression validator before calculation. 2. UI: Apple-style scientific layout (4x6 grid) using CSS Grid. 3. DESIGN: Dark theme with high-contrast displays, glassmorphic buttons with ':active' scale feedback. 4. FEATURES: History of last 5 operations, full scientific support (sin, cos, log, power), and a backspace/delete button. 5. UX: Ensure the font size of the result display scales down automatically if the number is too long (using clamp or JS logic)."/>
                                 </Border.InputBindings>
                                 <StackPanel>
                                     <TextBlock Text="Premium Calculator" Foreground="White" FontWeight="Medium" FontSize="14"/>
-                                    <TextBlock Text="A high-end scientific calculator with glassmorphism and smooth animations." Foreground="#888888" FontSize="12.5" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                                    <TextBlock Text="A professional scientific calculator with a state-machine logic and history." Foreground="#888888" FontSize="12.5" TextWrapping="Wrap" Margin="0,4,0,0"/>
                                 </StackPanel>
                             </Border>
                         </Grid>

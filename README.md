@@ -14,7 +14,24 @@
 
 ---
 
-Gemma Local Desktop is a native Windows application designed for high-performance local AI interaction. It combines a powerful chat interface with a sandboxed coding workspace.
+## 🚀 Experimental Project Status
+
+This is an **experimental project** designed to push the boundaries of local AI development on Windows. Despite its experimental nature, the application is **fully functional** and provides a stable environment for local LLM interaction.
+
+### Model Performance Notes:
+- **Small Models (E2B / E4B)**: Great for quick tests and low-latency interactions. While capable, they have natural limitations due to their parameter count—operate within reasonable expectations.
+- **Large Models (26B / 31B)**: These models handle complex coding tasks, logic, and creative requests **perfectly**, as originally intended. They provide a frontier-level experience on consumer hardware.
+
+---
+
+## 📸 Screenshots
+
+<p align="center">
+  <img src="GemmaChatCsharp/Assets/gemma-chat-win_1.png" alt="Setup Screen" width="45%" />
+  <img src="GemmaChatCsharp/Assets/gemma-chat-win_2.png" alt="Chat & Build Workspace" width="45%" />
+</p>
+
+---
 
 ## Key Features
 

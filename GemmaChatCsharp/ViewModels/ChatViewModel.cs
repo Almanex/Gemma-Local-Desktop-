@@ -234,8 +234,8 @@ public partial class ChatViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<AIModelInfo> _availableModels = new()
     {
-        new() { Name = "gemma-4-e2b-it", Label = "Gemma 4 E2B", Size = "1.5 GB", Description = "Edge-sized. Optimized for speed and efficiency. Text + Image + Audio." },
-        new() { Name = "gemma-4-e4b-it", Label = "Gemma 4 E4B", Size = "3 GB", Description = "Best all-rounder. High quality multimodal capabilities. Recommended." },
+        new() { Name = "gemma-4-e2b-it", Label = "Gemma 4 E2B", Size = "1.5 GB", Description = "Edge-sized. Optimized for speed and efficiency." },
+        new() { Name = "gemma-4-e4b-it", Label = "Gemma 4 E4B", Size = "3 GB", Description = "Best all-rounder. High quality text and code generation. Recommended." },
         new() { Name = "gemma-4-26b-a4b-it", Label = "Gemma 4 26B (MoE)", Size = "15 GB", Description = "Mixture-of-Experts. Faster than 31B, near same quality. Requires 24GB+ RAM/VRAM." },
         new() { Name = "gemma-4-31b-it", Label = "Gemma 4 31B", Size = "18 GB", Description = "Frontier dense model. Best intelligence. Requires 32GB+ RAM/VRAM." }
     };
@@ -514,7 +514,7 @@ public partial class ChatViewModel : ObservableObject
                     var activeName = parsed.ActiveFileName ?? (latestFiles.Count > 0 ? latestFiles.Keys.Last() : null);
                     var activeCode = activeName != null ? latestFiles[activeName] : null;
 
-                    System.Windows.Application.Current.Dispatcher.BeginInvoke(() => {
+                    _ = System.Windows.Application.Current.Dispatcher.BeginInvoke(() => {
                         assistantMsg.Content = displayText;
                         SyncToolCards(assistantMsg, cards);
                         
