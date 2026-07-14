@@ -1,8 +1,6 @@
-[ English ](GUIDE.md) • [ Русский ](GUIDE_RU.md) • [ Deutsch ](GUIDE_DE.md)
-
 # Benutzerhandbuch für Gemma Local Desktop
 
-Willkommen im Benutzerhandbuch für Gemma Local Desktop. Dieses Dokument enthält detaillierte Informationen zur Konfiguration, Ausführung und Optimierung Ihrer lokalen KI-Entwicklungsumgebung.
+Benutzerhandbuch für Gemma Local Desktop. Dieses Dokument enthält detaillierte Informationen zur Konfiguration, Ausführung und Optimierung Ihrer lokalen KI-Entwicklungsumgebung.
 
 ---
 
@@ -65,7 +63,7 @@ So starten Sie eine Vorlage:
 Jede Chat-Sitzung wird in einem persistenten Verzeichnis auf Ihrer lokalen Festplatte gespeichert:
 
 - **Lokaler Speicher**: Vom Assistenten generierte Dateien (z. B. `index.html`, Stylesheets, Skripte) werden direkt in einem speziellen Unterordner im Arbeitsbereichspfad des Chats gespeichert.
-- **Iterative Updates**: Wenn Sie den Assistenten bitten, die generierte Anwendung zu ändern (z. B. „Ändere die Designfarbe in Blau“ oder „Füge eine Reset-Schaltfläche hinzu“), gibt das Modell den aktualisierten Code nicht nur im Chat aus, sondern überschreibt oder bearbeitet die Zieldatei direkt im Arbeitsbereichsverzeichnis.
+- **Iterative Updates**: Wenn Sie den Assistenten bitten, die generierte Anwendung zu ändern (z. B. „Ändere die Designfarbe in Blau“ or „Füge eine Reset-Schaltfläche hinzu“), gibt das Modell den aktualisierten Code nicht nur im Chat aus, sondern überschreibt oder bearbeitet die Zieldatei direkt im Arbeitsbereichsverzeichnis.
 - **Automatische Vorschau-Aktualisierung**: Das Live-Vorschaufenster im Build-Modus wird automatisch aktualisiert, sobald eine Dateiänderung im Arbeitsbereich gespeichert wird.
 
 ---

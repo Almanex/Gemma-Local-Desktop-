@@ -1,5 +1,3 @@
-[ English ](README.md) • [ Русский ](docs/README_RU.md) • [ Deutsch ](docs/README_DE.md)
-
 # Gemma Local Desktop
 
 **Native Windows AI assistant and coding workspace powered by Google Gemma via llama.cpp.**
@@ -9,24 +7,6 @@
 [![Language: C#](https://img.shields.io/badge/Language-C%23-239120.svg)](https://learn.microsoft.com/dotnet/csharp/)
 [![Framework: .NET 10.0](https://img.shields.io/badge/Framework-.NET%2010.0-512bd4.svg)](https://dotnet.microsoft.com/)
 [![Share](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fgithub.com%2FAlmanex%2FGemma-Local-Desktop-)](https://twitter.com/intent/tweet?text=Check%20out%20Gemma%20Local%20Desktop%20-%20native%20Windows%20AI%20assistant%20and%20coding%20workspace&url=https%3A%2F%2Fgithub.com%2FAlmanex%2FGemma-Local-Desktop-)
-
----
-
-<details open>
-  <summary style="cursor: pointer; padding: 6px; font-family: sans-serif;"><b>[ Show ] 1. Initial Setup Screen</b></summary>
-  <br/>
-  <p align="center"><img src="GemmaChatCsharp/Assets/gemma-chat-win_1.png" width="95%" /></p>
-</details>
-<details>
-  <summary style="cursor: pointer; padding: 6px; font-family: sans-serif;"><b>[ Show ] 2. Chat and Build Workspace</b></summary>
-  <br/>
-  <p align="center"><img src="GemmaChatCsharp/Assets/gemma-chat-win_2.png" width="95%" /></p>
-</details>
-<details>
-  <summary style="cursor: pointer; padding: 6px; font-family: sans-serif;"><b>[ Show ] 3. Code Editor and Live Preview</b></summary>
-  <br/>
-  <p align="center"><img src="GemmaChatCsharp/Assets/gemma-chat-win_3.png" width="95%" /></p>
-</details>
 
 ---
 

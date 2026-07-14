@@ -1,5 +1,3 @@
-[ English ](GUIDE.md) • [ Русский ](GUIDE_RU.md) • [ Deutsch ](GUIDE_DE.md)
-
 # Gemma Local Desktop User Guide
 
 Welcome to the User Guide for Gemma Local Desktop. This document provides detailed information on how to configure, run, and optimize your local AI development environment.
